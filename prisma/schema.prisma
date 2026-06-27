@@ -1,0 +1,257 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                String               @id @default(uuid()) @db.Uuid
+  email             String               @unique
+  passwordHash      String               @map("password_hash")
+  nfcTagId          String?              @unique @map("nfc_tag_id")
+  accountStatus     AccountStatus        @default(ACTIVE) @map("account_status")
+  lastLogin         DateTime?            @map("last_login")
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+  pushToken         String?              @map("push_token")
+  allergies         Allergy[]
+  chronicConditions ChronicCondition[]
+  emergencyContacts EmergencyContact[]
+  medicalProfile    MedicalProfile?
+  nfcScans          ProfileScan[]
+  personalInfo      PersonalInformation?
+  privacySettings   PrivacySettings?
+  medications       UserMedication[]
+  medicalHistory    MedicalHistory[]
+
+  @@map("users")
+}
+
+model PersonalInformation {
+  id                   String     @id @default(uuid()) @db.Uuid
+  userId               String     @unique @map("user_id") @db.Uuid
+  firstName            String     @map("first_name")
+  lastName             String     @map("last_name")
+  dateOfBirth          DateTime?  @map("date_of_birth") @db.Date
+  gender               Gender?
+  bloodType            BloodType? @map("blood_type")
+  identificationNumber String?    @unique @map("identification_number")
+  identificationType   String?    @map("identification_type")
+  photoUrl             String?    @map("photo_url")
+  createdAt            DateTime   @default(now()) @map("created_at")
+  updatedAt            DateTime   @updatedAt @map("updated_at")
+  user                 User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("personal_information")
+}
+
+model MedicalProfile {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @unique @map("user_id") @db.Uuid
+  heightCm          Decimal? @map("height_cm") @db.Decimal(5, 2)
+  weightKg          Decimal? @map("weight_kg") @db.Decimal(5, 2)
+  organDonor        Boolean  @default(false) @map("organ_donor")
+  insuranceProvider String?  @map("insurance_provider")
+  additionalNotes   String?  @map("additional_notes")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("medical_profile")
+}
+
+model Allergy {
+  id                  String          @id @default(uuid()) @db.Uuid
+  userId              String          @map("user_id") @db.Uuid
+  allergenName        String          @map("allergen_name")
+  allergyType         AllergyType     @map("allergy_type")
+  severity            AllergySeverity
+  reactionDescription String?         @map("reaction_description")
+  isActive            Boolean         @default(true) @map("is_active")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+  user                User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("allergies")
+}
+
+model ChronicCondition {
+  id            String             @id @default(uuid()) @db.Uuid
+  userId        String             @map("user_id") @db.Uuid
+  conditionName String             @map("condition_name")
+  diagnosedDate DateTime?          @map("diagnosed_date") @db.Date
+  severity      ConditionSeverity?
+  status        ConditionStatus    @default(ACTIVE)
+  notes         String?
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("chronic_conditions")
+}
+
+model MedicationCatalog {
+  id              String           @id @default(uuid()) @db.Uuid
+  genericName     String           @unique @map("generic_name")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  userMedications UserMedication[]
+
+  @@map("medication_catalog")
+}
+
+model UserMedication {
+  id                   String             @id @default(uuid()) @db.Uuid
+  userId               String             @map("user_id") @db.Uuid
+  medicationId         String?            @map("medication_id") @db.Uuid
+  customMedicationName String?            @map("custom_medication_name")
+  dosage               String?
+  frequency            String?
+  route                MedicationRoute    @default(ORAL)
+  isCurrent            Boolean            @default(true) @map("is_current")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+  medication           MedicationCatalog? @relation(fields: [medicationId], references: [id])
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_medications")
+}
+
+model EmergencyContact {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  fullName      String   @map("full_name")
+  relationship  String
+  phonePrimary  String   @map("phone_primary")
+  phoneSecondary String? @map("phone_secondary")
+  priorityOrder Int      @default(1) @map("priority_order")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("emergency_contacts")
+}
+
+model MedicalHistory {
+  id        String                  @id @default(uuid()) @db.Uuid
+  userId    String                  @map("user_id") @db.Uuid
+  eventType MedicalHistoryEventType @map("event_type")
+  eventName String                  @map("event_name")
+  eventDate DateTime?               @map("event_date") @db.Date
+  location  String?
+  provider  String?
+  outcome   String?
+  createdAt DateTime                @default(now()) @map("created_at")
+  user      User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("medical_history")
+}
+
+model ProfileScan {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  scanType      ScanType @default(QR) @map("scan_type")
+  scanTimestamp DateTime @default(now()) @map("scan_timestamp")
+  scannerIp     String?  @map("scanner_ip")
+  accessGranted Boolean  @default(true) @map("access_granted")
+  createdAt     DateTime @default(now()) @map("created_at")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profile_scans")
+}
+
+model PrivacySettings {
+  id                    String   @id @default(uuid()) @db.Uuid
+  userId                String   @unique @map("user_id") @db.Uuid
+  showFullName          Boolean  @default(true) @map("show_full_name")
+  showPhoto             Boolean  @default(true) @map("show_photo")
+  showAge               Boolean  @default(true) @map("show_age")
+  showBloodType         Boolean  @default(true) @map("show_blood_type")
+  showMedicalHistory    Boolean  @default(true) @map("show_medical_history")
+  showMedications       Boolean  @default(true) @map("show_medications")
+  showAllergies         Boolean  @default(true) @map("show_allergies")
+  showEmergencyContacts Boolean  @default(true) @map("show_emergency_contacts")
+  showChronicConditions Boolean  @default(true) @map("show_chronic_conditions")
+  requireAuthentication Boolean  @default(false) @map("require_authentication")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("privacy_settings")
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum BloodType {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+enum AllergyType {
+  MEDICATION
+  FOOD
+  ENVIRONMENTAL
+  OTHER
+}
+
+enum AllergySeverity {
+  MILD
+  MODERATE
+  SEVERE
+  LIFE_THREATENING
+}
+
+enum ConditionStatus {
+  ACTIVE
+  MANAGED
+  IN_REMISSION
+  RESOLVED
+}
+
+enum ConditionSeverity {
+  MILD
+  MODERATE
+  SEVERE
+}
+
+enum MedicationRoute {
+  ORAL
+  INJECTION
+  TOPICAL
+  INHALATION
+  OTHER
+}
+
+enum MedicalHistoryEventType {
+  SURGERY
+  HOSPITALIZATION
+  VACCINATION
+  INJURY
+  OTHER
+}
+
+enum ScanType {
+  NFC
+  QR
+}
