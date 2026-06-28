@@ -43,6 +43,23 @@ async function getWatchToken(userId: string): Promise<string | null> {
     }
 }
 
+async function saveNotification(userId: string, title: string, body: string): Promise<void> {
+    try {
+        const { getDb } = await import("@/lib/firebase");
+        const db = getDb();
+        const colRef = db.collection("notifications").doc(userId).collection("items");
+        await colRef.add({ title, body, type: "qr_scan", read: false, timestamp: new Date() });
+        const snap = await colRef.orderBy("timestamp", "desc").get();
+        if (snap.size > 10) {
+            const batch = db.batch();
+            snap.docs.slice(10).forEach(d => batch.delete(d.ref));
+            await batch.commit();
+        }
+    } catch {
+        // Silently ignore — notification save is best-effort
+    }
+}
+
 export async function POST(
     req: NextRequest,
     { params }: { params: Promise<{ userId: string }> }
@@ -82,9 +99,12 @@ export async function POST(
             await sendExpoPush(user.pushToken, title, body, data);
         }
 
-        // Watch (FCM via Firestore)
+        // Watch (FCM via Firestore) + save notification record
         if (process.env.FIREBASE_FCM_JSON && process.env.FIREBASE_FIRESTORE_JSON) {
-            const watchToken = await getWatchToken(userId);
+            const [watchToken] = await Promise.all([
+                getWatchToken(userId),
+                saveNotification(userId, title, body),
+            ]);
             if (watchToken) {
                 await sendFcmPush(watchToken, title, body, data);
             }
