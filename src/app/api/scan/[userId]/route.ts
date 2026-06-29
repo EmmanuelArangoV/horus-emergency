@@ -92,7 +92,7 @@ export async function POST(
         });
         const title = "Perfil consultado";
         const body = `Tu ID médico fue escaneado el ${scanDate}`;
-        const data: Record<string, string> = { type: "profile_scanned", scanType: "QR" };
+        const data: Record<string, string> = { type: "profile_scanned", scanType: "QR", userId };
 
         // Phone (Expo)
         if (user?.pushToken) {
