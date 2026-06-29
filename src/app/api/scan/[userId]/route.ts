@@ -35,8 +35,8 @@ async function sendFcmPush(token: string, title: string, body: string, data?: Re
 
 async function getWatchToken(userId: string): Promise<string | null> {
     try {
-        const { getFcmDb } = await import("@/lib/firebase");
-        const doc = await getFcmDb().collection("user_tokens").doc(userId).get();
+        const { getDb } = await import("@/lib/firebase");
+        const doc = await getDb().collection("user_tokens").doc(userId).get();
         return doc.exists ? (doc.data()?.watchFcmToken ?? null) : null;
     } catch {
         return null;
