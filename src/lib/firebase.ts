@@ -24,6 +24,12 @@ export function getMessaging() {
     return _getMessaging(getFcmApp());
 }
 
+// Firestore del proyecto FCM (horus-98edf) — donde el watch escribe watchFcmToken
+export function getFcmDb() {
+    return getFirestore(getFcmApp());
+}
+
+// Firestore del proyecto de datos (horus-64e3b) — donde se guardan notificaciones
 export function getDb() {
     return getFirestore(getFirestoreApp());
 }
