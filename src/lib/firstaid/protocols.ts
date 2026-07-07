@@ -24,8 +24,8 @@ export const PROTOCOLS: Protocol[] = [
             { id: 3, instruction: "Llama al 123 o pide a alguien que llame", warning: "Hazlo AHORA antes de continuar" },
             { id: 4, instruction: "Inclina la cabeza hacia atrás y eleva el mentón para abrir la vía aérea" },
             { id: 5, instruction: "Verifica respiración durante máximo 10 segundos", duration: 10 },
-            { id: 6, instruction: "Coloca el talón de tu mano en el centro del pecho (esternón)", warning: "Entrelaza tus manos" },
-            { id: 7, instruction: "Realiza 30 compresiones fuertes y rápidas", duration: 18, warning: "Hunde el pecho 5-6 cm a ritmo de 100-120 por minuto" },
+            { id: 6, instruction: "Coloca el talón de tu mano en el centro del pecho (sobre el esternón)", warning: "Entrelaza tus manos", illustration: "rcp_hands" },
+            { id: 7, instruction: "Realiza 30 compresiones fuertes y rápidas", duration: 18, warning: "Hunde el pecho 5-6 cm a ritmo de 100-120 por minuto", illustration: "esternon" },
             { id: 8, instruction: "Da 2 respiraciones de rescate tapando la nariz", duration: 4 },
             { id: 9, instruction: "Repite ciclos de 30 compresiones + 2 respiraciones", warning: "Continúa hasta que llegue ayuda o el paciente respire" },
         ],
@@ -69,10 +69,10 @@ export const PROTOCOLS: Protocol[] = [
         ],
         steps: [
             { id: 1, instruction: "Pregunta: ¿Te estás atragantando? Si asiente, actúa" },
-            { id: 2, instruction: "Inclínalo hacia adelante y da 5 golpes fuertes en la espalda con el talón de la mano", warning: "Entre los omóplatos" },
+            { id: 2, instruction: "Inclínalo hacia adelante y da 5 golpes fuertes en la espalda con el talón de la mano", warning: "Entre los omóplatos (las paletas de la espalda)", illustration: "omoplatos" },
             { id: 3, instruction: "Si no funciona: párate detrás, rodea su cintura con tus brazos" },
             { id: 4, instruction: "Coloca un puño justo encima del ombligo, cúbrelo con la otra mano" },
-            { id: 5, instruction: "Realiza 5 compresiones abdominales hacia adentro y arriba (Maniobra de Heimlich)", duration: 10 },
+            { id: 5, instruction: "Realiza 5 compresiones abdominales hacia adentro y arriba (Maniobra de Heimlich)", duration: 10, illustration: "heimlich" },
             { id: 6, instruction: "Alterna 5 golpes en espalda + 5 compresiones hasta que el objeto salga", warning: "Si pierde el conocimiento, inicia RCP" },
         ],
         decisionTree: [
@@ -109,7 +109,7 @@ export const PROTOCOLS: Protocol[] = [
             { id: 2, instruction: "Retira objetos peligrosos alrededor" },
             { id: 3, instruction: "Afloja ropa ajustada en cuello" },
             { id: 4, instruction: "Mide el tiempo de la convulsión", duration: 300, warning: "Si pasa de 5 minutos llama al 123" },
-            { id: 5, instruction: "Cuando termine, coloca en posición lateral de seguridad" },
+            { id: 5, instruction: "Cuando termine, coloca en posición lateral de seguridad", illustration: "posicion_lateral" },
             { id: 6, instruction: "Habla tranquilamente al paciente mientras recupera la conciencia" },
         ],
         decisionTree: [
@@ -128,7 +128,7 @@ export const PROTOCOLS: Protocol[] = [
             {
                 id: "consciente",
                 question: "¿La persona recupera la conciencia y respira bien?",
-                yes: [{ id: 1, instruction: "Coloca en posición lateral de seguridad" }, { id: 2, instruction: "Habla con calma y quédate a su lado hasta que se oriente completamente" }],
+                yes: [{ id: 1, instruction: "Coloca en posición lateral de seguridad", illustration: "posicion_lateral" }, { id: 2, instruction: "Habla con calma y quédate a su lado hasta que se oriente completamente" }],
                 no: [{ id: 1, instruction: "Llama al 123 — verifica que respira" }, { id: 2, instruction: "Si no respira, inicia RCP" }],
             },
         ],
@@ -149,7 +149,7 @@ export const PROTOCOLS: Protocol[] = [
         ],
         steps: [
             { id: 1, instruction: "Llama al 123 INMEDIATAMENTE", warning: "Esta es una emergencia que amenaza la vida" },
-            { id: 2, instruction: "Pregunta si tiene epinefrina (EpiPen) — si sí, ayúdalo a usarla en el muslo externo" },
+            { id: 2, instruction: "Pregunta si tiene epinefrina (EpiPen) — si sí, ayúdalo a usarla en el muslo externo", illustration: "epipen" },
             { id: 3, instruction: "Acuesta al paciente con las piernas elevadas (a menos que tenga dificultad respiratoria)" },
             { id: 4, instruction: "Si tiene dificultad respiratoria, siéntalo en posición cómoda" },
             { id: 5, instruction: "Mantén al paciente abrigado y calmado" },
@@ -159,7 +159,7 @@ export const PROTOCOLS: Protocol[] = [
             {
                 id: "epipen",
                 question: "¿La persona tiene epinefrina (EpiPen o similar) disponible?",
-                yes: [{ id: 1, instruction: "Aplica el EpiPen en el muslo externo (puede ser sobre la ropa)" }, { id: 2, instruction: "Mantén presionado 10 segundos, luego masajea la zona", duration: 10 }, { id: 3, instruction: "Llama al 123 aunque mejore — puede necesitar segunda dosis en 5-15 min" }],
+                yes: [{ id: 1, instruction: "Aplica el EpiPen en el muslo externo (puede ser sobre la ropa)", illustration: "epipen" }, { id: 2, instruction: "Mantén presionado 10 segundos, luego masajea la zona", duration: 10 }, { id: 3, instruction: "Llama al 123 aunque mejore — puede necesitar segunda dosis en 5-15 min" }],
                 no: "respira",
             },
             {
@@ -172,7 +172,7 @@ export const PROTOCOLS: Protocol[] = [
                 id: "consciente",
                 question: "¿Está consciente y puede tragar?",
                 yes: [{ id: 1, instruction: "Acuesta con piernas elevadas" }, { id: 2, instruction: "Espera ambulancia — NO le des nada por la boca", duration: 300 }],
-                no: [{ id: 1, instruction: "Coloca en posición lateral de seguridad" }, { id: 2, instruction: "Verifica respiración — si no respira, inicia RCP" }],
+                no: [{ id: 1, instruction: "Coloca en posición lateral de seguridad", illustration: "posicion_lateral" }, { id: 2, instruction: "Verifica respiración — si no respira, inicia RCP" }],
             },
         ],
     },
@@ -213,7 +213,7 @@ export const PROTOCOLS: Protocol[] = [
             {
                 id: "extremidad",
                 question: "¿La herida es en un brazo o pierna?",
-                yes: [{ id: 1, instruction: "Aplica presión directa fuerte durante 10 minutos sin soltar", duration: 600 }, { id: 2, instruction: "Eleva la extremidad por encima del corazón" }, { id: 3, instruction: "Si no cede en 10 min, considera torniquete y llama al 123" }],
+                yes: [{ id: 1, instruction: "Aplica presión directa fuerte durante 10 minutos sin soltar", duration: 600 }, { id: 2, instruction: "Eleva la extremidad por encima del corazón" }, { id: 3, instruction: "Si no cede en 10 min, considera torniquete y llama al 123", illustration: "torniquete" }],
                 no: [{ id: 1, instruction: "Aplica presión directa y llama al 123 inmediatamente" }, { id: 2, instruction: "No muevas al paciente si sospechas trauma" }],
             },
         ],

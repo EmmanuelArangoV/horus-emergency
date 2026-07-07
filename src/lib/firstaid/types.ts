@@ -5,6 +5,7 @@ export interface ProtocolStep {
     instruction: string;
     duration?:   number;
     warning?:    string;
+    illustration?: "omoplatos" | "esternon" | "heimlich" | "rcp_hands" | "posicion_lateral" | "epipen" | "torniquete";
 }
 
 export interface DecisionNode {

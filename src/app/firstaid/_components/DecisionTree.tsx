@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { DecisionNode, ProtocolStep } from "@/lib/firstaid/types";
 import StepTimer from "./StepTimer";
+import StepIllustration from "./StepIllustration";
 
 export default function DecisionTree({ nodes }: { nodes: DecisionNode[] }) {
     const [currentId, setCurrentId] = useState<string | null>(nodes[0]?.id ?? null);
@@ -52,6 +53,7 @@ export default function DecisionTree({ nodes }: { nodes: DecisionNode[] }) {
                                 <span style={{ width: 22, height: 22, borderRadius: "50%", background: "#27AE60", color: "#fff", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>{i + 1}</span>
                                 <p style={{ fontSize: 13, fontWeight: 500, color: "#1A1512", lineHeight: 1.5, margin: 0 }}>{step.instruction}</p>
                             </div>
+                            {step.illustration && <div style={{ paddingLeft: 32 }}><StepIllustration type={step.illustration} /></div>}
                             {step.duration && <div style={{ paddingLeft: 32 }}><StepTimer duration={step.duration} /></div>}
                         </div>
                     ))}

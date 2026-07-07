@@ -7,6 +7,7 @@ import { PROTOCOLS } from "@/lib/firstaid/protocols";
 import { searchProtocols } from "@/lib/firstaid/search";
 import StepTimer from "./StepTimer";
 import DecisionTree from "./DecisionTree";
+import StepIllustration from "./StepIllustration";
 
 // ── Colores por severidad ─────────────────────────────────────────────────────
 const SEV = {
@@ -130,6 +131,7 @@ function ProtocolModal({ protocol, onClose }: { protocol: Protocol; onClose: () 
                                             {step.warning && (
                                                 <p style={{ fontSize: 11, fontWeight: 600, color: "#C0392B", margin: "5px 0 0" }}>⚠ {step.warning}</p>
                                             )}
+                                            {step.illustration && <StepIllustration type={step.illustration} />}
                                             {step.duration && <StepTimer duration={step.duration} />}
                                         </div>
                                     </div>
